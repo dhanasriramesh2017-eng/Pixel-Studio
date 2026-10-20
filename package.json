@@ -1,0 +1,12 @@
+{
+  "name": "pixel-studio",
+  "version": "1.0.0",
+  "description": "Pixel Studio - Premium Pastel Pink Image Pixel Manipulation Tool",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["image-editor", "pixel-manipulation", "pastel"],
+  "author": "",
+  "license": "ISC"
+}

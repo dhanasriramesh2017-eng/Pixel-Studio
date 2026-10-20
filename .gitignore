@@ -1,0 +1,19 @@
+# Secret credentials
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Private user data and uploaded images
+data/
+storage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db

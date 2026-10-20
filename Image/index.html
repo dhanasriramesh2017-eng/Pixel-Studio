@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Studio — Refined Image & Pixel Manipulation</title>
+  <!-- Google Fonts: Cormorant Garamond for editorial accents, DM Sans for UI, Caveat for handwriting -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Minimal Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="#home" class="brand" id="brandLink" title="Return to Home">
+        <span class="logo-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="4" />
+            <path d="M3 9h18M9 21V9" />
+          </svg>
+        </span>
+        <div class="brand-text">
+          <span class="brand-name">Pixel Studio</span>
+          <span class="brand-crumb" id="headerCrumb">Home</span>
+        </div>
+      </a>
+
+      <nav class="nav-minimal">
+        <a href="#home" class="nav-item active" id="navHome">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          Home
+        </a>
+        <a href="#library" class="nav-item" id="navLibrary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          Library
+        </a>
+        <div class="status-pill" id="imageStatusBadge">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">No image loaded</span>
+        </div>
+
+        <!-- Auth Header Widget: Switched dynamically between Guest and Authenticated -->
+        <div class="auth-header-widget" id="authHeaderWidget">
+          <!-- Guest State (Default) -->
+          <div class="auth-guest-links" id="guestLinks">
+            <span class="guest-mode-pill" title="You are in Guest Mode. No account required!">Guest</span>
+            <a href="#login" class="btn-auth-link btn-auth-login">Sign In</a>
+            <a href="#register" class="btn-auth-link btn-auth-register">Register</a>
+          </div>
+
+          <!-- Logged-in State (Populated via JS) -->
+          <div class="auth-user-menu" id="userMenu" style="display: none;">
+            <button type="button" class="avatar-trigger" id="avatarTrigger" aria-expanded="false" aria-haspopup="true">
+              <span class="avatar-circle" id="userAvatarText">PS</span>
+              <span class="user-display-label" id="userDisplayName">User</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="user-dropdown-popup" id="userDropdownPopup">
+              <div class="dropdown-header">
+                <strong id="dropdownUserName">User</strong>
+                <span id="dropdownUserEmail" class="dropdown-email">user@example.com</span>
+              </div>
+              <div class="dropdown-divider"></div>
+              <a href="#profile" class="dropdown-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                My Profile
+              </a>
+              <a href="#library" class="dropdown-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+                Personal Library
+              </a>
+              <div class="dropdown-divider"></div>
+              <button type="button" class="dropdown-item text-danger" id="btnLogoutHeader">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container hosting dynamic views -->
+  <main class="main-content">
+
+    <!-- ============================================== -->
+    <!-- VIEW 0: HOMEPAGE (Visual-First, No Large Title) -->
+    <!-- ============================================== -->
+    <section class="view-panel active" id="view-home">
+      
+      <!-- Central Visual Section: 3-Column Workspace (Pixel Data Left, Stage Center, Static Polaroids Right) -->
+      <div class="center-showcase">
+        <div class="workspace-three-col">
+
+          <!-- Left Column: Pixel Data Visualization -->
+          <aside class="workspace-col workspace-col-left" aria-label="Pixel Data Inspector">
+            <div class="panel-card pixel-data-card" id="pixelDataCard">
+              <div class="card-header-mini">
+                <div class="header-icon-mini">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="panel-card-title">Pixel Data</h3>
+                  <span class="panel-card-subtitle">Live matrix inspector</span>
+                </div>
+              </div>
+
+              <!-- Zoom Canvas Container -->
+              <div class="pixel-zoom-block">
+                <div class="pixel-zoom-canvas-wrap">
+                  <canvas id="pixelZoomCanvas" width="132" height="132" aria-label="Zoomed pixel grid"></canvas>
+                  <div class="pixel-zoom-reticle" aria-hidden="true"></div>
+                </div>
+                <div class="pixel-zoom-status">
+                  <span class="zoom-status-badge" id="pixelZoomSampleBadge">Target Pixel</span>
+                </div>
+              </div>
+
+              <!-- Coordinates Readout -->
+              <div class="pixel-meta-row">
+                <div class="meta-data-chip">
+                  <span class="meta-chip-label">X</span>
+                  <span class="meta-chip-val" id="pvCoordX">0</span>
+                </div>
+                <div class="meta-data-chip">
+                  <span class="meta-chip-label">Y</span>
+                  <span class="meta-chip-val" id="pvCoordY">0</span>
+                </div>
+                <div class="meta-data-chip meta-chip-preview">
+                  <span class="meta-chip-label">Color</span>
+                  <div class="pixel-color-swatch" id="pvColorSwatch" style="background-color: rgb(240, 240, 240);"></div>
+                </div>
+              </div>
+
+              <!-- RGB Values Breakdown -->
+              <div class="pixel-channels-grid">
+                <div class="channel-card channel-red">
+                  <span class="channel-label">R</span>
+                  <span class="channel-value" id="pvColorR">0</span>
+                </div>
+                <div class="channel-card channel-green">
+                  <span class="channel-label">G</span>
+                  <span class="channel-value" id="pvColorG">0</span>
+                </div>
+                <div class="channel-card channel-blue">
+                  <span class="channel-label">B</span>
+                  <span class="channel-value" id="pvColorB">0</span>
+                </div>
+              </div>
+
+              <!-- Intensity Gradient (0 - 255) -->
+              <div class="intensity-gradient-block">
+                <div class="intensity-header-row">
+                  <span class="intensity-label">Intensity Map</span>
+                  <span class="intensity-val-badge" id="pvIntensity">0</span>
+                </div>
+                <div class="intensity-bar-track">
+                  <div class="intensity-bar-fill"></div>
+                  <div class="intensity-needle" id="intensityNeedle" style="left: 0%;"></div>
+                </div>
+                <div class="intensity-scale-labels">
+                  <span>0 (Black)</span>
+                  <span>128</span>
+                  <span>255 (White)</span>
+                </div>
+              </div>
+
+              <div class="pixel-hint-text">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>Hover or click canvas to inspect pixel</span>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Center Column: Main Stage Visual -->
+          <div class="workspace-col workspace-col-center">
+            <div class="tagline-wrap">
+              <span class="subtle-badge">Curated Image Atelier</span>
+              <p class="subtle-tagline">Fine pixel refinement &amp; precision image synthesis</p>
+            </div>
+
+            <!-- Interactive application canvas -->
+            <div class="visual-stage-card" id="centralVisualStage">
+              <div class="stage-frame">
+                <div class="stage-matting">
+                  <canvas id="stageCanvas" width="340" height="240"></canvas>
+                  <div class="loupe-overlay" id="loupeOverlay">
+                    <span class="loupe-coords" id="loupeCoords">X: — Y: —</span>
+                    <span class="loupe-value" id="loupeValue">Intensity: —</span>
+                  </div>
+                </div>
+                <div class="stage-info-bar">
+                  <div class="stage-meta">
+                    <span class="meta-label">Active Surface</span>
+                    <span class="meta-value" id="stageMetaDims">Interactive Studio Canvas</span>
+                  </div>
+                  <div class="stage-actions">
+                    <button type="button" class="btn-text-action" id="btnLoadSampleHome">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                      </svg>
+                      Try Sample Artwork
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Static Aesthetic Image Cards -->
+          <aside class="workspace-col workspace-col-right" aria-label="Aesthetic Inspiration">
+            <div class="polaroid-stack-container">
+              <div class="aesthetic-header-mini">
+                <span class="aesthetic-sparkle">✦</span>
+                <span class="aesthetic-title-cursive">Create · Edit · Explore</span>
+                <span class="aesthetic-sparkle">✦</span>
+              </div>
+
+              <!-- Static Polaroid 1: Flowers -->
+              <figure class="polaroid-card polaroid-1">
+                <div class="polaroid-img-wrap">
+                  <img src="gallery/flower-bouquet.jpg" alt="Botanical flower bouquet" loading="eager">
+                </div>
+                <figcaption class="polaroid-caption">Flowers</figcaption>
+              </figure>
+
+              <!-- Static Polaroid 2: Landscapes -->
+              <figure class="polaroid-card polaroid-2">
+                <div class="polaroid-img-wrap">
+                  <img src="gallery/golden-hour.jpg" alt="Golden landscape scenery" loading="eager">
+                </div>
+                <figcaption class="polaroid-caption">Landscapes</figcaption>
+              </figure>
+
+              <!-- Static Polaroid 3: Nature -->
+              <figure class="polaroid-card polaroid-3">
+                <div class="polaroid-img-wrap">
+                  <img src="gallery/butterfly.jpg" alt="Delicate butterfly wings" loading="eager">
+                </div>
+                <figcaption class="polaroid-caption">Nature</figcaption>
+              </figure>
+
+              <div class="polaroid-sparkles-footer" aria-hidden="true">
+                <span>✦</span>
+                <span class="sparkle-small">✧</span>
+                <span>✦</span>
+              </div>
+            </div>
+          </aside>
+
+        </div>
+      </div>
+
+      <!-- 7 Feature Cards Section -->
+      <div class="features-wrapper">
+        <div class="cards-grid">
+          
+          <!-- Card A: Upload Image -->
+          <a href="#upload" class="feature-card" id="cardUpload">
+            <div class="card-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+            </div>
+            <div class="card-body">
+              <h2 class="card-title">Upload Image</h2>
+              <p class="card-desc">Load a PNG or JPG from your computer, or import a raw pixel matrix.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+          </a>
+
+          <!-- Card B: Update Pixel -->
+          <a href="#update" class="feature-card" id="cardUpdate">
+            <div class="card-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+              </svg>
+            </div>
+            <div class="card-body">
+              <h2 class="card-title">Update Pixel</h2>
+              <p class="card-desc">Modify individual pixel intensity at exact row and column coordinates.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+          </a>
+
+          <!-- Card C: Search Pixel -->
+          <a href="#search" class="feature-card" id="cardSearch">
+            <div class="card-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </div>
+            <div class="card-body">
+              <h2 class="card-title">Search Pixel</h2>
+              <p class="card-desc">Locate all coordinate matches with a targeted intensity value.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+          </a>
+
+          <!-- Card D: Grayscale -->
+          <a href="#grayscale" class="feature-card" id="cardGrayscale">
+            <div class="card-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor" fill-opacity="0.3"/>
+              </svg>
+            </div>
+            <div class="card-body">
+              <h2 class="card-title">Grayscale</h2>
+              <p class="card-desc">Smoothly convert all color channels into balanced luminous tones.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+          </a>
+
+          <!-- Card E: Invert Image -->
+          <a href="#invert" class="feature-card" id="cardInvert">
+            <div class="card-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 22 22 22 12 2" />
+                <path d="M12 6v12l6 3" stroke-dasharray="2 2" />
+              </svg>
+            </div>
+            <div class="card-body">
+              <h2 class="card-title">Invert Image</h2>
+              <p class="card-desc">Invert tonal and color values across all pixels for artistic negative contrast.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+          </a>
+
+          <!-- Card F: View Pixel Matrix -->
+          <a href="#matrix" class="feature-card" id="cardMatrix">
+            <div class="card-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <line x1="3" y1="9" x2="21" y2="9" />
+                <line x1="3" y1="15" x2="21" y2="15" />
+                <line x1="9" y1="3" x2="9" y2="21" />
+                <line x1="15" y1="3" x2="15" y2="21" />
+              </svg>
+            </div>
+            <div class="card-body">
+              <h2 class="card-title">View Pixel Matrix</h2>
+              <p class="card-desc">Explore full pixel intensity values in a scrollable coordinate table.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+          </a>
+
+          <!-- Card G: Download Image -->
+          <a href="#download" class="feature-card card-span-highlight" id="cardDownload">
+            <div class="card-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            </div>
+            <div class="card-body">
+              <h2 class="card-title">Download Image</h2>
+              <p class="card-desc">Export the processed image as a crisp PNG or download full pixel matrix data as TXT.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 1: UPLOAD IMAGE PAGE                      -->
+    <!-- ============================================== -->
+    <section class="view-panel" id="view-upload">
+      <div class="view-header">
+        <a href="#home" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Home
+        </a>
+        <div class="view-title-group">
+          <h2 class="view-title">Upload Image</h2>
+          <p class="view-subtitle">Select an image file or load raw pixel matrix values</p>
+        </div>
+      </div>
+
+      <div class="feature-two-col">
+        <!-- Upload controls -->
+        <div class="panel-box">
+          <h3 class="panel-box-title">Choose File</h3>
+          
+          <label class="drop-zone" id="dropZone" tabindex="0">
+            <input type="file" id="fileInput" accept="image/png,image/jpeg">
+            <div class="drop-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+            </div>
+            <strong class="drop-label">Select image from computer</strong>
+            <span class="drop-hint">Drag & drop JPG or PNG here, or click to browse</span>
+          </label>
+
+          <div class="action-divider">
+            <span>or instant sample</span>
+          </div>
+
+          <button type="button" class="btn btn-secondary w-full" id="btnLoadSampleUpload">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+            Load Sample Pastel Artwork
+          </button>
+
+          <!-- Collapsible Manual Matrix Accordion -->
+          <details class="accordion-item" id="manualMatrixSection">
+            <summary class="accordion-summary">
+              <span>Manual Matrix Input (Java LOAD)</span>
+              <svg class="accordion-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </summary>
+            <div class="accordion-content">
+              <p class="input-helper">Enter intensity values (0–255), separated by spaces, one row per line.</p>
+              <textarea id="manualMatrixInput" rows="4" placeholder="0 128 255&#10;64 192 32&#10;255 180 90"></textarea>
+              <button type="button" class="btn btn-primary" id="btnLoadManual">Load Matrix Data</button>
+            </div>
+          </details>
+        </div>
+
+        <!-- Live Preview Card -->
+        <div class="panel-box">
+          <div class="panel-box-header">
+            <h3 class="panel-box-title">Image Preview</h3>
+            <span class="badge-subtle" id="uploadMetaBadge">Ready</span>
+          </div>
+          <div class="preview-viewport">
+            <canvas id="mainCanvasUpload" class="live-canvas"></canvas>
+            <div class="empty-state" id="emptyStateUpload">
+              <div class="empty-art">🌸</div>
+              <p>No image loaded yet.<br>Upload a file or click "Load Sample Pastel Artwork".</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 2: UPDATE PIXEL PAGE                      -->
+    <!-- ============================================== -->
+    <section class="view-panel" id="view-update">
+      <div class="view-header">
+        <a href="#home" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Home
+        </a>
+        <div class="view-title-group">
+          <h2 class="view-title">Update Pixel</h2>
+          <p class="view-subtitle">Modify individual pixel intensity at exact row and column coordinates</p>
+        </div>
+      </div>
+
+      <div class="feature-two-col">
+        <!-- Controls -->
+        <div class="panel-box">
+          <h3 class="panel-box-title">Pixel Parameters</h3>
+          <p class="input-helper">Click anywhere on the preview canvas to auto-select that coordinate, or enter values below.</p>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="updateRow">Row Coordinate (Y)</label>
+              <input type="number" id="updateRow" min="0" value="0" placeholder="0">
+              <span class="field-range-note" id="updateRowMaxNote">Max: —</span>
+            </div>
+            
+            <div class="form-group">
+              <label for="updateCol">Column Coordinate (X)</label>
+              <input type="number" id="updateCol" min="0" value="0" placeholder="0">
+              <span class="field-range-note" id="updateColMaxNote">Max: —</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="updateVal">New Intensity (0–255)</label>
+            <div class="input-with-swatch">
+              <input type="number" id="updateVal" min="0" max="255" value="255">
+              <div class="intensity-swatch" id="updateSwatch" style="background-color: rgb(255,255,255);"></div>
+            </div>
+            <input type="range" id="updateSlider" min="0" max="255" value="255" class="range-slider">
+          </div>
+
+          <div class="current-pixel-info" id="currentPixelInfo">
+            <span class="info-label">Target Pixel:</span>
+            <span class="info-val" id="targetPixelSummary">None selected</span>
+          </div>
+
+          <button type="button" class="btn btn-primary w-full" id="btnApplyUpdate">
+            Update Pixel
+          </button>
+        </div>
+
+        <!-- Canvas Inspection Viewport -->
+        <div class="panel-box">
+          <div class="panel-box-header">
+            <h3 class="panel-box-title">Canvas Inspector</h3>
+            <span class="badge-subtle">Click to Pick Pixel</span>
+          </div>
+          <div class="preview-viewport interactive" id="viewportUpdate">
+            <canvas id="mainCanvasUpdate" class="live-canvas"></canvas>
+            <div class="empty-state" id="emptyStateUpdate">
+              <p>Please upload an image first.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 3: SEARCH PIXEL PAGE                      -->
+    <!-- ============================================== -->
+    <section class="view-panel" id="view-search">
+      <div class="view-header">
+        <a href="#home" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Home
+        </a>
+        <div class="view-title-group">
+          <h2 class="view-title">Search Pixel</h2>
+          <p class="view-subtitle">Find coordinates of all pixels matching a specific intensity</p>
+        </div>
+      </div>
+
+      <div class="feature-two-col">
+        <!-- Controls & Results -->
+        <div class="panel-box">
+          <h3 class="panel-box-title">Search Value</h3>
+          
+          <div class="search-form-row">
+            <div class="form-group flex-1">
+              <label for="searchVal">Target Intensity (0–255)</label>
+              <input type="number" id="searchVal" min="0" max="255" placeholder="e.g. 255" value="255">
+            </div>
+            <button type="button" class="btn btn-primary btn-align-bottom" id="btnExecuteSearch">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              Search
+            </button>
+          </div>
+
+          <div class="results-container">
+            <div class="results-header">
+              <span class="results-title">Matching Coordinates</span>
+              <span class="results-count" id="searchResultsCount">0 found</span>
+            </div>
+            <div class="results-chips" id="searchChipsBox">
+              <span class="results-empty-hint">Enter an intensity value and click Search</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview with Highlights -->
+        <div class="panel-box">
+          <div class="panel-box-header">
+            <h3 class="panel-box-title">Search Visualizer</h3>
+            <span class="badge-subtle" id="searchVisualizerBadge">Ready</span>
+          </div>
+          <div class="preview-viewport">
+            <canvas id="mainCanvasSearch" class="live-canvas"></canvas>
+            <div class="empty-state" id="emptyStateSearch">
+              <p>Please upload an image first.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 4: GRAYSCALE PAGE                         -->
+    <!-- ============================================== -->
+    <section class="view-panel" id="view-grayscale">
+      <div class="view-header">
+        <a href="#home" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Home
+        </a>
+        <div class="view-title-group">
+          <h2 class="view-title">Grayscale Filter</h2>
+          <p class="view-subtitle">Convert the active image to balanced monochromatic luminance</p>
+        </div>
+      </div>
+
+      <div class="feature-two-col">
+        <!-- Controls & Explanation -->
+        <div class="panel-box">
+          <h3 class="panel-box-title">Luminance Processing</h3>
+          <p class="input-helper">
+            Calculates the average intensity across the RGB channels for every individual pixel:
+            <br><code>Intensity = (R + G + B) / 3</code>
+          </p>
+          <div class="button-stack">
+            <button type="button" class="btn btn-primary w-full" id="btnApplyGrayscale">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor" fill-opacity="0.3"/>
+              </svg>
+              Apply Grayscale Conversion
+            </button>
+            <button type="button" class="btn btn-secondary w-full" id="btnRevertGrayscale">
+              Revert to Original
+            </button>
+          </div>
+        </div>
+
+        <!-- Preview Viewport -->
+        <div class="panel-box">
+          <div class="panel-box-header">
+            <h3 class="panel-box-title">Filter Preview</h3>
+            <span class="badge-subtle" id="grayscaleMetaBadge">Monochrome</span>
+          </div>
+          <div class="preview-viewport">
+            <canvas id="mainCanvasGrayscale" class="live-canvas"></canvas>
+            <div class="empty-state" id="emptyStateGrayscale">
+              <p>Please upload an image first.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 5: INVERT IMAGE PAGE                      -->
+    <!-- ============================================== -->
+    <section class="view-panel" id="view-invert">
+      <div class="view-header">
+        <a href="#home" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Home
+        </a>
+        <div class="view-title-group">
+          <h2 class="view-title">Invert Image</h2>
+          <p class="view-subtitle">Invert tonal and color values across all pixels for negative contrast</p>
+        </div>
+      </div>
+
+      <div class="feature-two-col">
+        <!-- Controls & Explanation -->
+        <div class="panel-box">
+          <h3 class="panel-box-title">Color Inversion</h3>
+          <p class="input-helper">
+            Subtracts each color channel value from 255 to create the photonegative complement:
+            <br><code>Channel' = 255 - Channel</code>
+          </p>
+          <div class="button-stack">
+            <button type="button" class="btn btn-primary w-full" id="btnApplyInvert">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 2 22 22 22 12 2" />
+              </svg>
+              Invert Image Colors
+            </button>
+            <button type="button" class="btn btn-secondary w-full" id="btnRevertInvert">
+              Revert to Original
+            </button>
+          </div>
+        </div>
+
+        <!-- Preview Viewport -->
+        <div class="panel-box">
+          <div class="panel-box-header">
+            <h3 class="panel-box-title">Inversion Preview</h3>
+            <span class="badge-subtle" id="invertMetaBadge">Tonal Negative</span>
+          </div>
+          <div class="preview-viewport">
+            <canvas id="mainCanvasInvert" class="live-canvas"></canvas>
+            <div class="empty-state" id="emptyStateInvert">
+              <p>Please upload an image first.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 6: VIEW PIXEL MATRIX PAGE                 -->
+    <!-- ============================================== -->
+    <section class="view-panel" id="view-matrix">
+      <div class="view-header">
+        <a href="#home" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Home
+        </a>
+        <div class="view-title-group">
+          <h2 class="view-title">Pixel Intensity Matrix</h2>
+          <p class="view-subtitle">Interactive coordinate grid of pixel luminance values</p>
+        </div>
+      </div>
+
+      <div class="panel-box matrix-panel">
+        <div class="matrix-toolbar">
+          <div class="matrix-stats">
+            <span class="badge-subtle" id="matrixDimensionsBadge">0 × 0 px</span>
+            <span class="matrix-hint" id="matrixViewRangeNote">Showing interactive window</span>
+          </div>
+          <div class="matrix-cell-inspect" id="matrixCellInspect">
+            <span>Hover or click any cell to inspect</span>
+          </div>
+        </div>
+
+        <div class="matrix-scroll-wrapper" id="matrixContainer">
+          <div class="empty-state" id="emptyStateMatrix">
+            <p>Upload an image to inspect its pixel matrix values.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 7: DOWNLOAD IMAGE PAGE                    -->
+    <!-- ============================================== -->
+    <section class="view-panel" id="view-download">
+      <div class="view-header">
+        <a href="#home" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Home
+        </a>
+        <div class="view-title-group">
+          <h2 class="view-title">Download & Export</h2>
+          <p class="view-subtitle">Save modified image or export raw coordinate intensity matrix</p>
+        </div>
+      </div>
+
+      <div class="feature-two-col">
+        <!-- Export Controls -->
+        <div class="panel-box">
+          <h3 class="panel-box-title">Export Options</h3>
+          
+          <div class="form-group">
+            <label for="exportFilename">Custom File Name</label>
+            <input type="text" id="exportFilename" value="pixel-studio-artwork" placeholder="file-name">
+          </div>
+
+          <div class="export-cards-stack">
+            <div class="export-option-card">
+              <div class="export-opt-text">
+                <strong>Modified Image (.PNG)</strong>
+                <span>High-fidelity lossless image export with all pixel alterations.</span>
+              </div>
+              <button type="button" class="btn btn-primary" id="btnDownloadPng">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Download PNG
+              </button>
+            </div>
+
+            <div class="export-option-card">
+              <div class="export-opt-text">
+                <strong>Pixel Intensity Matrix (.TXT)</strong>
+                <span>Raw matrix containing intensity values separated by spaces for every coordinate.</span>
+              </div>
+              <button type="button" class="btn btn-secondary" id="btnExportTxt">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+                Export Matrix TXT
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary & Preview -->
+        <div class="panel-box">
+          <div class="panel-box-header">
+            <h3 class="panel-box-title">Artwork Summary</h3>
+            <span class="badge-subtle" id="downloadMetaBadge">Ready to Export</span>
+          </div>
+          <div class="preview-viewport">
+            <canvas id="mainCanvasDownload" class="live-canvas"></canvas>
+            <div class="empty-state" id="emptyStateDownload">
+              <p>Please upload an image first.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- ============================================== -->
+    <!-- VIEW 8: PERSONAL LIBRARY                       -->
+    <!-- ============================================== -->
+    <section class="view-panel" id="view-library">
+      <div class="view-header">
+        <a href="#home" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Home
+        </a>
+        <div class="view-title-group">
+          <h2 class="view-title">Personal Library</h2>
+          <p class="view-subtitle">Your uploaded original images and processing download history</p>
+        </div>
+      </div>
+
+      <!-- Guest Notice Banner (displayed if guest opens library) -->
+      <div class="guest-library-banner" id="guestLibraryBanner" style="display: none;">
+        <div class="guest-banner-icon">🌸</div>
+        <div class="guest-banner-body">
+          <strong>You are currently in Guest Mode</strong>
+          <p>Guests can freely use all image editing features. Sign in or create a free account to permanently save your uploaded images and download history across devices.</p>
+        </div>
+        <div class="guest-banner-actions">
+          <a href="#login" class="btn btn-secondary btn-sm">Sign In</a>
+          <a href="#register" class="btn btn-primary btn-sm">Create Account</a>
+          <a href="#home" class="btn-text-action">Continue as Guest →</a>
+        </div>
+      </div>
+
+      <!-- Library Tab Controls -->
+      <div class="library-container">
+        <div class="library-tabs-bar">
+          <div class="library-tabs">
+            <button type="button" class="lib-tab active" id="tabUploads" data-tab="uploads">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+              My Uploaded Images
+              <span class="tab-count-pill" id="uploadsTabBadge">0</span>
+            </button>
+            <button type="button" class="lib-tab" id="tabDownloads" data-tab="downloads">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              My Downloads
+              <span class="tab-count-pill" id="downloadsTabBadge">0</span>
+            </button>
+          </div>
+          
+          <div class="library-top-actions" id="libTopActions">
+            <a href="#upload" class="btn btn-secondary btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Upload New Image
+            </a>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT A: MY UPLOADED IMAGES -->
+        <div class="lib-tab-content active" id="panelUploads">
+          <div class="lib-info-header">
+            <p class="input-helper">Original uploaded images saved to your cloud/local studio account. Reopening an image loads a working copy into the studio while leaving your original safely intact.</p>
+          </div>
+          <div class="library-gallery-grid" id="uploadedGalleryGrid">
+            <!-- Populated via JS -->
+          </div>
+          <div class="empty-state" id="emptyStateUploads" style="display: none;">
+            <div class="empty-art">🖼️</div>
+            <p>No uploaded images in your library yet.<br>Upload an image in the studio or click "Upload New Image" above.</p>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT B: MY DOWNLOADS -->
+        <div class="lib-tab-content" id="panelDownloads" style="display: none;">
+          <div class="lib-info-header">
+            <p class="input-helper">History of images and pixel matrices downloaded or exported by you. You can download any saved result again or remove it from your history.</p>
+          </div>
+          <div class="library-gallery-grid" id="downloadsGalleryGrid">
+            <!-- Populated via JS -->
+          </div>
+          <div class="empty-state" id="emptyStateDownloads" style="display: none;">
+            <div class="empty-art">💾</div>
+            <p>No download history recorded yet.<br>When you download modified PNGs or export TXT matrices, they will be archived here.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 9: LOGIN PAGE                             -->
+    <!-- ============================================== -->
+    <section class="view-panel" id="view-login">
+      <div class="view-header">
+        <a href="#home" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Home
+        </a>
+        <div class="view-title-group">
+          <h2 class="view-title">Welcome Back</h2>
+          <p class="view-subtitle">Sign in to your Pixel Studio personal library</p>
+        </div>
+      </div>
+
+      <div class="auth-card-container">
+        <div class="panel-box auth-box">
+          <div class="auth-header-block">
+            <span class="subtle-badge">Studio Access</span>
+            <h3 class="auth-title">Sign in to your account</h3>
+            <p class="auth-desc">Access your personal uploaded images, history, and downloads.</p>
+          </div>
+
+          <form id="formLogin" class="auth-form" onsubmit="return false;">
+            <div class="form-group">
+              <label for="loginEmail">Email Address</label>
+              <input type="email" id="loginEmail" placeholder="yourname@example.com" required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+              <div class="label-with-action">
+                <label for="loginPassword">Password</label>
+                <a href="#forgot-password" class="auth-sub-link">Forgot password?</a>
+              </div>
+              <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full" id="btnSubmitLogin">
+              Sign In to Studio
+            </button>
+          </form>
+
+          <div class="auth-footer-text">
+            <span>Don't have an account?</span>
+            <a href="#register" class="auth-accent-link">Create Account</a>
+          </div>
+
+          <!-- Visible Continue as Guest option -->
+          <div class="guest-option-card">
+            <div class="guest-opt-desc">
+              <strong>Prefer to try without an account?</strong>
+              <p>Guests have full access to all 7 image-processing features without registration.</p>
+            </div>
+            <a href="#home" class="btn btn-secondary w-full" id="btnGuestFromLogin">
+              Continue as Guest
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 10: REGISTER / CREATE ACCOUNT PAGE        -->
+    <!-- ============================================== -->
+    <section class="view-panel" id="view-register">
+      <div class="view-header">
+        <a href="#home" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Home
+        </a>
+        <div class="view-title-group">
+          <h2 class="view-title">Create Account</h2>
+          <p class="view-subtitle">Join Pixel Studio to save your personal library</p>
+        </div>
+      </div>
+
+      <div class="auth-card-container">
+        <div class="panel-box auth-box">
+          <div class="auth-header-block">
+            <span class="subtle-badge">Personal Library</span>
+            <h3 class="auth-title">Create your studio account</h3>
+            <p class="auth-desc">Securely save your original images and keep full download history.</p>
+          </div>
+
+          <form id="formRegister" class="auth-form" onsubmit="return false;">
+            <div class="form-group">
+              <label for="regDisplayName">Your Name / Artist Alias</label>
+              <input type="text" id="regDisplayName" placeholder="e.g. Dahlia Rose" required autocomplete="name">
+            </div>
+
+            <div class="form-group">
+              <label for="regEmail">Email Address</label>
+              <input type="email" id="regEmail" placeholder="yourname@example.com" required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+              <label for="regPassword">Password (6+ characters)</label>
+              <input type="password" id="regPassword" placeholder="••••••••" required minlength="6" autocomplete="new-password">
+            </div>
+
+            <div class="form-group">
+              <label for="regPasswordConfirm">Confirm Password</label>
+              <input type="password" id="regPasswordConfirm" placeholder="••••••••" required minlength="6" autocomplete="new-password">
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full" id="btnSubmitRegister">
+              Create Studio Account
+            </button>
+          </form>
+
+          <div class="auth-footer-text">
+            <span>Already have an account?</span>
+            <a href="#login" class="auth-accent-link">Sign In</a>
+          </div>
+
+          <!-- Visible Continue as Guest option -->
+          <div class="guest-option-card">
+            <div class="guest-opt-desc">
+              <strong>Just want to edit an image?</strong>
+              <p>You can use every manipulation tool without creating an account.</p>
+            </div>
+            <a href="#home" class="btn btn-secondary w-full" id="btnGuestFromRegister">
+              Continue as Guest
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 11: FORGOT / RESET PASSWORD PAGE          -->
+    <!-- ============================================== -->
+    <section class="view-panel" id="view-forgot-password">
+      <div class="view-header">
+        <a href="#login" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Login
+        </a>
+        <div class="view-title-group">
+          <h2 class="view-title">Password Recovery</h2>
+          <p class="view-subtitle">Reset your Pixel Studio account password</p>
+        </div>
+      </div>
+
+      <div class="auth-card-container">
+        <div class="panel-box auth-box">
+          <div class="auth-header-block">
+            <span class="subtle-badge">Account Recovery</span>
+            <h3 class="auth-title">Reset your password</h3>
+            <p class="auth-desc">Request a recovery code to set a new password.</p>
+          </div>
+
+          <!-- Step 1: Request code -->
+          <form id="formForgotRequest" class="auth-form" onsubmit="return false;">
+            <div class="form-group">
+              <label for="forgotEmail">Account Email Address</label>
+              <input type="email" id="forgotEmail" placeholder="yourname@example.com" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-full" id="btnGetResetCode">
+              Generate Reset Code
+            </button>
+          </form>
+
+          <!-- Step 2: Submit Reset -->
+          <form id="formResetSubmit" class="auth-form" style="display: none; margin-top: 16px;" onsubmit="return false;">
+            <div class="form-group">
+              <label for="resetTokenInput">Reset Code</label>
+              <input type="text" id="resetTokenInput" placeholder="Enter code" required>
+            </div>
+            <div class="form-group">
+              <label for="resetNewPassword">New Password</label>
+              <input type="password" id="resetNewPassword" placeholder="••••••••" required minlength="6">
+            </div>
+            <button type="submit" class="btn btn-primary w-full" id="btnApplyPasswordReset">
+              Set New Password
+            </button>
+          </form>
+
+          <div class="auth-footer-text">
+            <span>Remember your password?</span>
+            <a href="#login" class="auth-accent-link">Return to Sign In</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 12: USER PROFILE PAGE                     -->
+    <!-- ============================================== -->
+    <section class="view-panel" id="view-profile">
+      <div class="view-header">
+        <a href="#home" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Home
+        </a>
+        <div class="view-title-group">
+          <h2 class="view-title">User Profile</h2>
+          <p class="view-subtitle">Manage your studio credentials and library settings</p>
+        </div>
+      </div>
+
+      <div class="feature-two-col">
+        <!-- Profile Overview Card -->
+        <div class="panel-box">
+          <div class="profile-hero-card">
+            <div class="profile-avatar-large" id="profileAvatarLarge">PS</div>
+            <h3 class="profile-name" id="profileNameDisplay">User</h3>
+            <p class="profile-email" id="profileEmailDisplay">user@example.com</p>
+            <span class="badge-subtle" id="profileJoinedBadge">Member since Today</span>
+          </div>
+
+          <div class="profile-stats-row">
+            <div class="pstat-item">
+              <span class="pstat-val" id="profileStatUploads">0</span>
+              <span class="pstat-lbl">Originals Saved</span>
+            </div>
+            <div class="pstat-item">
+              <span class="pstat-val" id="profileStatDownloads">0</span>
+              <span class="pstat-lbl">Downloads Recorded</span>
+            </div>
+          </div>
+
+          <div class="button-stack" style="margin-top: 20px;">
+            <a href="#library" class="btn btn-secondary w-full">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+              View Personal Library
+            </a>
+            <button type="button" class="btn btn-secondary w-full text-danger" id="btnLogoutProfile">
+              Sign Out of Account
+            </button>
+          </div>
+        </div>
+
+        <!-- Edit Profile & Security -->
+        <div class="panel-box">
+          <h3 class="panel-box-title">Account Settings</h3>
+
+          <form id="formUpdateProfileName" class="profile-sub-form" onsubmit="return false;">
+            <div class="form-group">
+              <label for="editDisplayName">Display Name</label>
+              <div class="input-with-button">
+                <input type="text" id="editDisplayName" placeholder="Display name">
+                <button type="submit" class="btn btn-secondary" id="btnSaveName">Save</button>
+              </div>
+            </div>
+          </form>
+
+          <div class="action-divider">
+            <span>Change Password</span>
+          </div>
+
+          <form id="formChangePassword" class="profile-sub-form" onsubmit="return false;">
+            <div class="form-group">
+              <label for="currentPassword">Current Password</label>
+              <input type="password" id="currentPassword" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+              <label for="newPassword">New Password (6+ characters)</label>
+              <input type="password" id="newPassword" placeholder="••••••••" minlength="6">
+            </div>
+            <button type="submit" class="btn btn-primary w-full" id="btnSavePassword">
+              Update Password
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Delete Confirmation Modal Dialog -->
+  <div class="modal-backdrop" id="deleteConfirmModal" style="display: none;" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirm Deletion</h3>
+        <button type="button" class="modal-close" id="btnCancelDeleteX">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="deleteModalMessage">Are you sure you want to remove this item? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCancelDelete">Cancel</button>
+        <button type="button" class="btn btn-primary btn-danger-action" id="btnConfirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div class="toast" id="toastNotice" role="status" aria-live="polite"></div>
+
+  <!-- Shared hidden working canvas -->
+  <canvas id="sharedCanvas" style="display:none;"></canvas>
+
+  <script src="script.js"></script>
+</body>
+</html>
